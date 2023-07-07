@@ -1,0 +1,160 @@
+---
+Tratamento de dados:
+```{r}
+# get data
+students <- read.csv("student-mat.csv", sep = ",")
+#pivot_longer to get G1, G2, G3 in one column
+students <- students %>%
+  pivot_longer(cols = c("G1", "G2", "G3"), names_to = "G", values_to = "grades")
+
+# make "G1" become 0, "G2" become 1, "G3" become 2
+students$G[students$G=="G1"]<-0
+students$G[students$G=="G2"]<-1
+students$G[students$G=="G3"]<-2
+
+# make "yes" become 1, "no" become 0
+students$schoolsup[students$schoolsup=="yes"]<-1
+students$schoolsup[students$schoolsup=="no"]<-0
+
+# as.numeric to convert to numeric
+students$G <- as.numeric(students$G)
+students$schoolsup <- as.numeric(students$schoolsup)
+```
+
+Modelo 1: Multinivel longitudinal com intercepto aleatório
+schoolsup e failures como preditores
+```{r}
+print("Multilevel longitudinal model with schoolsup and failures as predictors and G as multilevel variable \n random intercepts")
+model_intercept <- lme4::lmer(grades ~  schoolsup + failures + (1 | G), data = students)
+summary(model_intercept)
+
+model_intercept.rmse <- sqrt(mean(residuals(model_intercept)^2))
+
+# plot the model
+plot(model_intercept)
+
+coef(model_intercept)
+print(paste("RMSE:", model_intercept.rmse))
+print(paste("AIC:", AIC(model_intercept)))
+```
+
+Modelo 2: Multinivel longitudinal com coeficiente angular aleatorio em failures
+schoolsup e failures como preditores
+```{r}
+print("Multilevel longitudinal model with schoolsup and failures as predictors and G as multilevel variable \n random slopes")
+
+model_slope <- lme4::lmer(grades ~  schoolsup + failures + (1 + failures | G), data = students)
+summary(model_slope)
+# plot the model
+plot(model_slope)
+
+coef(model_slope)
+model_slope.rmse <- sqrt(mean(residuals(model_slope)^2))
+print(paste("RMSE:", model_slope.rmse))
+print(paste("AIC:", AIC(model_slope)))
+```
+
+Modelo 3: Multinivel longitudinal com coeficiente angular aleatorio em schoolsup
+schoolsup e failures como preditores
+```{r}
+print("Multilevel longitudinal model with schoolsup and failures as predictors and G as multilevel variable \n random slopes")
+
+model_slope <- lme4::lmer(grades ~  schoolsup + failures + (1 + schoolsup | G), data = students)
+summary(model_slope)
+# plot the model
+plot(model_slope)
+
+coef(model_slope)
+model_slope.rmse <- sqrt(mean(residuals(model_slope)^2))
+print(paste("RMSE:", model_slope.rmse))
+print(paste("AIC:", AIC(model_slope)))
+```
+
+Modelo 4: Multinivel longitudinal com coeficiente angular aleatorio em schoolsup e failures
+schoolsup e failures como preditores
+```{r}
+print("Multilevel longitudinal model with schoolsup and failures as predictors and G as multilevel variable \n random slopes")
+
+model_slope <- lme4::lmer(grades ~  schoolsup + failures + (1 + schoolsup + failures | G), data = students)
+summary(model_slope)
+# plot the model
+plot(model_slope)
+
+coef(model_slope)
+model_slope.rmse <- sqrt(mean(residuals(model_slope)^2))
+print(paste("RMSE:", model_slope.rmse))
+print(paste("AIC:", AIC(model_slope)))
+```
+
+Modelo 5: Multinivel longitudinal com coeficiente angular aleatorio em schoolsup e failures
+schoolsup e failures como preditores
+```{r}
+print("Multilevel longitudinal model with schoolsup and failures as predictors and G as multilevel variable \n random slopes")
+
+model_slope <- lme4::lmer(grades ~  schoolsup + failures + (1 + schoolsup + failures | G), data = students)
+summary(model_slope)
+
+# plot the model
+plot(model_slope)
+
+coef(model_slope)
+model_slope.rmse <- sqrt(mean(residuals(model_slope)^2))
+print(paste("RMSE:", model_slope.rmse))
+print(paste("AIC:", AIC(model_slope)))
+```
+
+Modelo 6: Multinivel longitudinal com coeficiente angular aleatorio em schoolsup
+failures como preditor
+```{r}
+print("Multilevel longitudinal model with schoolsup and failures as predictors and G as multilevel variable \n random slopes")
+
+model_slope <- lme4::lmer(grades ~  failures + (1 + schoolsup | G), data = students)
+summary(model_slope)
+
+# plot the model
+plot(model_slope)
+
+coef(model_slope)
+model_slope.rmse <- sqrt(mean(residuals(model_slope)^2))
+print(paste("RMSE:", model_slope.rmse))
+print(paste("AIC:", AIC(model_slope)))
+```
+
+Modelo 7: Multinivel longitudinal com coeficiente angular aleatorio em failures e schoolsup
+failures e schoolsup como preditor
+```{r}
+model_slope3 <- lme4::lmer(grades ~ 1 + failures + schoolsup + (0 + failures + schoolsup | G), data = students)
+summary(model_slope3)
+
+model_slope3.rmse <- sqrt(mean(residuals(model_slope3)^2))
+
+print(paste("RMSE:", model_slope3.rmse))
+print(paste("AIC:", AIC(model_slope3)))
+
+# plot the model
+plot(model_slope3)
+
+coef(model_slope3)
+```
+
+Modelo 8: Multinivel longitudinal com coeficiente angular aleatorio em failures e schoolsup
+failures e schoolsup como preditor
+```{r}
+
+
+model_slope3 <- lme4::lmer(grades ~ failures + schoolsup +  (0 + failures + schoolsup | G), data = students)
+summary(model_slope3)
+
+model_slope3.rmse <- sqrt(mean(residuals(model_slope3)^2))
+
+print(paste("RMSE:", model_slope3.rmse))
+print(paste("AIC:", AIC(model_slope3)))
+
+
+
+
+# plot the model
+plot(model_slope3)
+
+coef(model_slope3)
+```
